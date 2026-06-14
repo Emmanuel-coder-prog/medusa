@@ -11,7 +11,6 @@ on:
       - main
     paths:
       - apps/backend/**
-      
 
 jobs:
   secret-scan:
@@ -55,9 +54,7 @@ jobs:
           semgrep \
             --config p/security-audit \
             --config p/nodejs \
-            backend/src
-
- 
+            apps/backend/src
 
   production-ci:
     needs:
@@ -88,30 +85,22 @@ jobs:
         with:
           node-version: "22"
           cache: "pnpm"
-          cache-dependency-path: backend/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ─────────────────────────────────────────
-      # DATABASE MIGRATIONS (NEW - IMPORTANT)
-      # ─────────────────────────────────────────
-      - name: Run Prisma migrations
-        run: pnpm medusa db:migrate 
-
       - name: Generate Prisma client
-        run: pnpm prisma generate
+        run: pnpm medusa db:generate
 
-      - name: Validate Prisma schema
-        run: pnpm medusa db:validate
+      - name: Run Prisma migrations
+        run: pnpm medusa db:migrate
 
       - name: Run lint
-        run: pnpm run lint
+        run: pnpm lint
 
       - name: Build application
-        run: pnpm run build
+        run: pnpm medusa build
 
       - name: Run unit tests
         run: pnpm test
-
-   
