@@ -1,9 +1,19 @@
-import { loadEnv, defineConfig } from "@medusajs/framework/utils"
+import {
+  loadEnv,
+  defineConfig,
+  Modules,
+  ContainerRegistrationKeys,
+} from "@medusajs/framework/utils";
 
-loadEnv(process.env.NODE_ENV || "development", process.cwd())
+loadEnv(process.env.NODE_ENV || "development", process.cwd());
 
 module.exports = defineConfig({
+  admin: {
+    disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
+    backendUrl: process.env.MEDUSA_BACKEND_URL,
+  },
   projectConfig: {
+    workerMode: process.env.MEDUSA_WORKER_MODE as "shared" | "worker" | "server",
     databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
@@ -13,8 +23,18 @@ module.exports = defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
   },
-
-  admin: {
-    disable: true,
-  },
-})
+  plugins: [
+    {
+      resolve: "medusa-plugin-wishlist",
+      options: {},
+    },
+  ],
+  // modules: [
+  //   {
+  //     resolve: "./src/modules/blog",
+  //   },
+  //   {
+  //     resolve: "./src/modules/manager",
+  //   },
+  // ],
+});
